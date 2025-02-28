@@ -1,0 +1,984 @@
+2025-02-28 21:30:42 [INFO] Question: what is the data size
+2025-02-28 21:30:42 [INFO] Running PandaAI with openai LLM...
+2025-02-28 21:30:42 [INFO] Prompt ID: 0bc609aa-e99a-4050-b791-0120121e7f50
+2025-02-28 21:30:42 [INFO] Generating new code...
+2025-02-28 21:30:42 [INFO] Using Prompt: <tables>
+
+<table dialect="duckdb" table_name="table_data" dimensions="700x16">
+Segment,Country, Product , Discount Band ,Units Sold, Manufacturing Price , Sale Price , Gross Sales , Discounts ,  Sales , COGS , Profit ,Date,Month Number, Month Name ,Year
+Government,Canada, Carretera , None ,1618.5, $3.00 , $20.00 ," $32,370.00 ", $-   ," $32,370.00 "," $16,185.00 "," $16,185.00 ",1/1/14,1, January ,2014
+Government,Germany, Carretera , None ,1321.0, $3.00 , $20.00 ," $26,420.00 ", $-   ," $26,420.00 "," $13,210.00 "," $13,210.00 ",1/1/14,1, January ,2014
+Midmarket,France, Carretera , None ,2178.0, $3.00 , $15.00 ," $32,670.00 ", $-   ," $32,670.00 "," $21,780.00 "," $10,890.00 ",6/1/14,6, June ,2014
+Midmarket,Germany, Carretera , None ,888.0, $3.00 , $15.00 ," $13,320.00 ", $-   ," $13,320.00 "," $8,880.00 "," $4,440.00 ",6/1/14,6, June ,2014
+Midmarket,Mexico, Carretera , None ,2470.0, $3.00 , $15.00 ," $37,050.00 ", $-   ," $37,050.00 "," $24,700.00 "," $12,350.00 ",6/1/14,6, June ,2014
+</table>
+
+
+</tables>
+
+You are already provided with the following functions that you can call:
+<function>
+def execute_sql_query(sql_query: str) -> pd.Dataframe
+    """This method connects to the database, executes the sql query and returns the dataframe"""
+</function>
+
+
+Update this initial code:
+```python
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+
+# Declare result var: 
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+```
+
+
+
+### QUERY
+ what is the data size
+
+At the end, declare "result" variable as a dictionary of type and value.
+
+
+Generate python code and return full updated code:
+
+### Note: Use only relevant table for query and do aggregation, sorting, joins and grouby through sql query
+2025-02-28 21:30:48 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-02-28 21:30:48 [INFO] Code Generated:
+# TODO: import the required dependencies
+import pandas as pd
+
+# Execute SQL query to get the count of rows in the table_data
+sql_query = "SELECT COUNT(*) AS data_size FROM table_data"
+data_size_df = execute_sql_query(sql_query)
+
+# Extract the data size from the dataframe
+data_size = data_size_df['data_size'].iloc[0]
+
+# Declare result var: 
+result = {
+    "type": "number",
+    "value": data_size
+}
+2025-02-28 21:30:48 [INFO] Validating code requirements...
+2025-02-28 21:30:48 [INFO] Code validation successful.
+2025-02-28 21:30:48 [INFO] Cleaning the generated code...
+2025-02-28 21:30:48 [INFO] Executing code: import pandas as pd
+sql_query = 'SELECT COUNT(*) AS data_size FROM table_data'
+data_size_df = execute_sql_query(sql_query)
+data_size = data_size_df['data_size'].iloc[0]
+result = {'type': 'number', 'value': data_size}
+2025-02-28 21:30:48 [INFO] Response generated successfully.
+2025-02-28 21:31:00 [INFO] Question: give me graphs to understand this data 
+2025-02-28 21:31:00 [INFO] Running PandaAI with openai LLM...
+2025-02-28 21:31:00 [INFO] Prompt ID: 3666d4ab-13ba-4f54-a26e-1bd764b48806
+2025-02-28 21:31:00 [INFO] Generating new code...
+2025-02-28 21:31:00 [INFO] Using Prompt: <tables>
+
+<table dialect="duckdb" table_name="table_data" dimensions="700x16">
+Segment,Country, Product , Discount Band ,Units Sold, Manufacturing Price , Sale Price , Gross Sales , Discounts ,  Sales , COGS , Profit ,Date,Month Number, Month Name ,Year
+Government,Canada, Carretera , None ,1618.5, $3.00 , $20.00 ," $32,370.00 ", $-   ," $32,370.00 "," $16,185.00 "," $16,185.00 ",1/1/14,1, January ,2014
+Government,Germany, Carretera , None ,1321.0, $3.00 , $20.00 ," $26,420.00 ", $-   ," $26,420.00 "," $13,210.00 "," $13,210.00 ",1/1/14,1, January ,2014
+Midmarket,France, Carretera , None ,2178.0, $3.00 , $15.00 ," $32,670.00 ", $-   ," $32,670.00 "," $21,780.00 "," $10,890.00 ",6/1/14,6, June ,2014
+Midmarket,Germany, Carretera , None ,888.0, $3.00 , $15.00 ," $13,320.00 ", $-   ," $13,320.00 "," $8,880.00 "," $4,440.00 ",6/1/14,6, June ,2014
+Midmarket,Mexico, Carretera , None ,2470.0, $3.00 , $15.00 ," $37,050.00 ", $-   ," $37,050.00 "," $24,700.00 "," $12,350.00 ",6/1/14,6, June ,2014
+</table>
+
+
+</tables>
+
+You are already provided with the following functions that you can call:
+<function>
+def execute_sql_query(sql_query: str) -> pd.Dataframe
+    """This method connects to the database, executes the sql query and returns the dataframe"""
+</function>
+
+
+Update this initial code:
+```python
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+
+# Declare result var: 
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+```
+
+
+
+### QUERY
+ give me graphs to understand this data 
+
+At the end, declare "result" variable as a dictionary of type and value.
+
+
+Generate python code and return full updated code:
+
+### Note: Use only relevant table for query and do aggregation, sorting, joins and grouby through sql query
+2025-02-28 21:31:45 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-02-28 21:31:45 [INFO] Code Generated:
+# TODO: import the required dependencies
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Execute SQL query to aggregate data
+sql_query = """
+SELECT 
+    Country,
+    Segment,
+    SUM(Gross_Sales) AS Total_Gross_Sales,
+    SUM(Sales) AS Total_Sales,
+    SUM(Profit) AS Total_Profit
+FROM 
+    table_data
+GROUP BY 
+    Country, Segment
+ORDER BY 
+    Total_Gross_Sales DESC
+"""
+
+# Fetch the data into a DataFrame
+data = execute_sql_query(sql_query)
+
+# Plotting the data
+plt.figure(figsize=(12, 6))
+
+# Bar plot for Total Gross Sales
+plt.subplot(1, 3, 1)
+data.pivot(index='Country', columns='Segment', values='Total_Gross_Sales').plot(kind='bar', ax=plt.gca())
+plt.title('Total Gross Sales by Country and Segment')
+plt.ylabel('Total Gross Sales')
+plt.xticks(rotation=45)
+
+# Bar plot for Total Sales
+plt.subplot(1, 3, 2)
+data.pivot(index='Country', columns='Segment', values='Total_Sales').plot(kind='bar', ax=plt.gca())
+plt.title('Total Sales by Country and Segment')
+plt.ylabel('Total Sales')
+plt.xticks(rotation=45)
+
+# Bar plot for Total Profit
+plt.subplot(1, 3, 3)
+data.pivot(index='Country', columns='Segment', values='Total_Profit').plot(kind='bar', ax=plt.gca())
+plt.title('Total Profit by Country and Segment')
+plt.ylabel('Total Profit')
+plt.xticks(rotation=45)
+
+# Adjust layout
+plt.tight_layout()
+plt.savefig('sales_profit_analysis.png')
+plt.show()
+
+# Declare result var: 
+result = {
+    "type": "plot",
+    "value": "sales_profit_analysis.png"
+}
+2025-02-28 21:31:45 [INFO] Validating code requirements...
+2025-02-28 21:31:45 [INFO] Code validation successful.
+2025-02-28 21:31:45 [INFO] Cleaning the generated code...
+2025-02-28 21:31:45 [INFO] Executing code: import pandas as pd
+import matplotlib.pyplot as plt
+sql_query = """
+SELECT 
+    Country,
+    Segment,
+    SUM(Gross_Sales) AS Total_Gross_Sales,
+    SUM(Sales) AS Total_Sales,
+    SUM(Profit) AS Total_Profit
+FROM 
+    table_data
+GROUP BY 
+    Country, Segment
+ORDER BY 
+    Total_Gross_Sales DESC
+"""
+data = execute_sql_query(sql_query)
+plt.figure(figsize=(12, 6))
+plt.subplot(1, 3, 1)
+data.pivot(index='Country', columns='Segment', values='Total_Gross_Sales').plot(kind='bar', ax=plt.gca())
+plt.title('Total Gross Sales by Country and Segment')
+plt.ylabel('Total Gross Sales')
+plt.xticks(rotation=45)
+plt.subplot(1, 3, 2)
+data.pivot(index='Country', columns='Segment', values='Total_Sales').plot(kind='bar', ax=plt.gca())
+plt.title('Total Sales by Country and Segment')
+plt.ylabel('Total Sales')
+plt.xticks(rotation=45)
+plt.subplot(1, 3, 3)
+data.pivot(index='Country', columns='Segment', values='Total_Profit').plot(kind='bar', ax=plt.gca())
+plt.title('Total Profit by Country and Segment')
+plt.ylabel('Total Profit')
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.savefig('exports/charts/temp_chart_b09b68c8-b6e5-4671-be5e-d6ad246591db.png')
+result = {'type': 'plot', 'value': 'exports/charts/temp_chart_b09b68c8-b6e5-4671-be5e-d6ad246591db.png'}
+2025-02-28 21:31:45 [INFO] Retrying execution (1/3)...
+2025-02-28 21:31:45 [INFO] Execution failed with error: Traceback (most recent call last):
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 136, in _execute_local_sql_query
+    return db_manager.sql(query).df()
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/data_loader/duck_db_connection_manager.py", line 38, in sql
+    return self.connection.sql(query)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+duckdb.duckdb.BinderException: Binder Error: Referenced column "Gross_Sales" not found in FROM clause!
+Candidate bindings: "table_data. Gross Sales ", "table_data. Sale Price ", "table_data.  Sales ", "table_data.Units Sold", "table_data. Month Name "
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/core/code_execution/code_executor.py", line 29, in execute
+    exec(code, self._environment)
+  File "<string>", line 17, in <module>
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 157, in _execute_sql_query
+    return self._execute_local_sql_query(query)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 138, in _execute_local_sql_query
+    raise RuntimeError(f"SQL execution failed: {e}") from e
+RuntimeError: SQL execution failed: Binder Error: Referenced column "Gross_Sales" not found in FROM clause!
+Candidate bindings: "table_data. Gross Sales ", "table_data. Sale Price ", "table_data.  Sales ", "table_data.Units Sold", "table_data. Month Name "
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 169, in execute_with_retries
+    result = self.execute_code(code)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 121, in execute_code
+    return code_executor.execute_and_return_result(code)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/core/code_execution/code_executor.py", line 38, in execute_and_return_result
+    self.execute(code)
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/core/code_execution/code_executor.py", line 31, in execute
+    raise CodeExecutionError("Code execution failed") from e
+pandasai.exceptions.CodeExecutionError: Code execution failed
+
+2025-02-28 21:31:45 [INFO] Using Prompt: <table dialect="duckdb" table_name="table_data" dimensions="700x16">
+Segment,Country, Product , Discount Band ,Units Sold, Manufacturing Price , Sale Price , Gross Sales , Discounts ,  Sales , COGS , Profit ,Date,Month Number, Month Name ,Year
+Government,Canada, Carretera , None ,1618.5, $3.00 , $20.00 ," $32,370.00 ", $-   ," $32,370.00 "," $16,185.00 "," $16,185.00 ",1/1/14,1, January ,2014
+Government,Germany, Carretera , None ,1321.0, $3.00 , $20.00 ," $26,420.00 ", $-   ," $26,420.00 "," $13,210.00 "," $13,210.00 ",1/1/14,1, January ,2014
+Midmarket,France, Carretera , None ,2178.0, $3.00 , $15.00 ," $32,670.00 ", $-   ," $32,670.00 "," $21,780.00 "," $10,890.00 ",6/1/14,6, June ,2014
+Midmarket,Germany, Carretera , None ,888.0, $3.00 , $15.00 ," $13,320.00 ", $-   ," $13,320.00 "," $8,880.00 "," $4,440.00 ",6/1/14,6, June ,2014
+Midmarket,Mexico, Carretera , None ,2470.0, $3.00 , $15.00 ," $37,050.00 ", $-   ," $37,050.00 "," $24,700.00 "," $12,350.00 ",6/1/14,6, June ,2014
+</table>
+
+
+The user asked the following question:
+### QUERY
+ give me graphs to understand this data 
+
+You generated the following Python code:
+import pandas as pd
+import matplotlib.pyplot as plt
+sql_query = """
+SELECT 
+    Country,
+    Segment,
+    SUM(Gross_Sales) AS Total_Gross_Sales,
+    SUM(Sales) AS Total_Sales,
+    SUM(Profit) AS Total_Profit
+FROM 
+    table_data
+GROUP BY 
+    Country, Segment
+ORDER BY 
+    Total_Gross_Sales DESC
+"""
+data = execute_sql_query(sql_query)
+plt.figure(figsize=(12, 6))
+plt.subplot(1, 3, 1)
+data.pivot(index='Country', columns='Segment', values='Total_Gross_Sales').plot(kind='bar', ax=plt.gca())
+plt.title('Total Gross Sales by Country and Segment')
+plt.ylabel('Total Gross Sales')
+plt.xticks(rotation=45)
+plt.subplot(1, 3, 2)
+data.pivot(index='Country', columns='Segment', values='Total_Sales').plot(kind='bar', ax=plt.gca())
+plt.title('Total Sales by Country and Segment')
+plt.ylabel('Total Sales')
+plt.xticks(rotation=45)
+plt.subplot(1, 3, 3)
+data.pivot(index='Country', columns='Segment', values='Total_Profit').plot(kind='bar', ax=plt.gca())
+plt.title('Total Profit by Country and Segment')
+plt.ylabel('Total Profit')
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.savefig('exports/charts/temp_chart_b09b68c8-b6e5-4671-be5e-d6ad246591db.png')
+result = {'type': 'plot', 'value': 'exports/charts/temp_chart_b09b68c8-b6e5-4671-be5e-d6ad246591db.png'}
+
+However, it resulted in the following error:
+Traceback (most recent call last):
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 136, in _execute_local_sql_query
+    return db_manager.sql(query).df()
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/data_loader/duck_db_connection_manager.py", line 38, in sql
+    return self.connection.sql(query)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+duckdb.duckdb.BinderException: Binder Error: Referenced column "Gross_Sales" not found in FROM clause!
+Candidate bindings: "table_data. Gross Sales ", "table_data. Sale Price ", "table_data.  Sales ", "table_data.Units Sold", "table_data. Month Name "
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/core/code_execution/code_executor.py", line 29, in execute
+    exec(code, self._environment)
+  File "<string>", line 17, in <module>
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 157, in _execute_sql_query
+    return self._execute_local_sql_query(query)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 138, in _execute_local_sql_query
+    raise RuntimeError(f"SQL execution failed: {e}") from e
+RuntimeError: SQL execution failed: Binder Error: Referenced column "Gross_Sales" not found in FROM clause!
+Candidate bindings: "table_data. Gross Sales ", "table_data. Sale Price ", "table_data.  Sales ", "table_data.Units Sold", "table_data. Month Name "
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 169, in execute_with_retries
+    result = self.execute_code(code)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 121, in execute_code
+    return code_executor.execute_and_return_result(code)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/core/code_execution/code_executor.py", line 38, in execute_and_return_result
+    self.execute(code)
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/core/code_execution/code_executor.py", line 31, in execute
+    raise CodeExecutionError("Code execution failed") from e
+pandasai.exceptions.CodeExecutionError: Code execution failed
+
+
+Fix the python code above and return the new python code but the code generated should use execute_sql_query function
+2025-02-28 21:31:53 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-02-28 21:31:54 [INFO] Code Generated:
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Corrected SQL query with proper column names
+sql_query = """
+SELECT 
+    Country,
+    Segment,
+    SUM("Gross Sales") AS Total_Gross_Sales,
+    SUM("Sales") AS Total_Sales,
+    SUM(Profit) AS Total_Profit
+FROM 
+    table_data
+GROUP BY 
+    Country, Segment
+ORDER BY 
+    Total_Gross_Sales DESC
+"""
+
+# Execute the SQL query
+data = execute_sql_query(sql_query)
+
+# Create bar plots for Total Gross Sales, Total Sales, and Total Profit
+plt.figure(figsize=(12, 6))
+
+# Total Gross Sales
+plt.subplot(1, 3, 1)
+data.pivot(index='Country', columns='Segment', values='Total_Gross_Sales').plot(kind='bar', ax=plt.gca())
+plt.title('Total Gross Sales by Country and Segment')
+plt.ylabel('Total Gross Sales')
+plt.xticks(rotation=45)
+
+# Total Sales
+plt.subplot(1, 3, 2)
+data.pivot(index='Country', columns='Segment', values='Total_Sales').plot(kind='bar', ax=plt.gca())
+plt.title('Total Sales by Country and Segment')
+plt.ylabel('Total Sales')
+plt.xticks(rotation=45)
+
+# Total Profit
+plt.subplot(1, 3, 3)
+data.pivot(index='Country', columns='Segment', values='Total_Profit').plot(kind='bar', ax=plt.gca())
+plt.title('Total Profit by Country and Segment')
+plt.ylabel('Total Profit')
+plt.xticks(rotation=45)
+
+plt.tight_layout()
+plt.savefig('exports/charts/temp_chart_b09b68c8-b6e5-4671-be5e-d6ad246591db.png')
+result = {'type': 'plot', 'value': 'exports/charts/temp_chart_b09b68c8-b6e5-4671-be5e-d6ad246591db.png'}
+2025-02-28 21:31:54 [INFO] Validating code requirements...
+2025-02-28 21:31:54 [INFO] Code validation successful.
+2025-02-28 21:31:54 [INFO] Cleaning the generated code...
+2025-02-28 21:31:54 [INFO] Executing code: import pandas as pd
+import matplotlib.pyplot as plt
+sql_query = """
+SELECT 
+    Country,
+    Segment,
+    SUM("Gross Sales") AS Total_Gross_Sales,
+    SUM("Sales") AS Total_Sales,
+    SUM(Profit) AS Total_Profit
+FROM 
+    table_data
+GROUP BY 
+    Country, Segment
+ORDER BY 
+    Total_Gross_Sales DESC
+"""
+data = execute_sql_query(sql_query)
+plt.figure(figsize=(12, 6))
+plt.subplot(1, 3, 1)
+data.pivot(index='Country', columns='Segment', values='Total_Gross_Sales').plot(kind='bar', ax=plt.gca())
+plt.title('Total Gross Sales by Country and Segment')
+plt.ylabel('Total Gross Sales')
+plt.xticks(rotation=45)
+plt.subplot(1, 3, 2)
+data.pivot(index='Country', columns='Segment', values='Total_Sales').plot(kind='bar', ax=plt.gca())
+plt.title('Total Sales by Country and Segment')
+plt.ylabel('Total Sales')
+plt.xticks(rotation=45)
+plt.subplot(1, 3, 3)
+data.pivot(index='Country', columns='Segment', values='Total_Profit').plot(kind='bar', ax=plt.gca())
+plt.title('Total Profit by Country and Segment')
+plt.ylabel('Total Profit')
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.savefig('exports/charts/temp_chart_d7142894-b2e8-42b5-82c9-2f47bbbac666.png')
+result = {'type': 'plot', 'value': 'exports/charts/temp_chart_d7142894-b2e8-42b5-82c9-2f47bbbac666.png'}
+2025-02-28 21:31:54 [INFO] Retrying execution (2/3)...
+2025-02-28 21:31:54 [INFO] Execution failed with error: Traceback (most recent call last):
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 136, in _execute_local_sql_query
+    return db_manager.sql(query).df()
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/data_loader/duck_db_connection_manager.py", line 38, in sql
+    return self.connection.sql(query)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+duckdb.duckdb.BinderException: Binder Error: Referenced column "Gross Sales" not found in FROM clause!
+Candidate bindings: "table_data. Gross Sales ", "table_data. Sale Price ", "table_data.  Sales ", "table_data.Units Sold", "table_data. Profit "
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/core/code_execution/code_executor.py", line 29, in execute
+    exec(code, self._environment)
+  File "<string>", line 17, in <module>
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 157, in _execute_sql_query
+    return self._execute_local_sql_query(query)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 138, in _execute_local_sql_query
+    raise RuntimeError(f"SQL execution failed: {e}") from e
+RuntimeError: SQL execution failed: Binder Error: Referenced column "Gross Sales" not found in FROM clause!
+Candidate bindings: "table_data. Gross Sales ", "table_data. Sale Price ", "table_data.  Sales ", "table_data.Units Sold", "table_data. Profit "
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 169, in execute_with_retries
+    result = self.execute_code(code)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 121, in execute_code
+    return code_executor.execute_and_return_result(code)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/core/code_execution/code_executor.py", line 38, in execute_and_return_result
+    self.execute(code)
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/core/code_execution/code_executor.py", line 31, in execute
+    raise CodeExecutionError("Code execution failed") from e
+pandasai.exceptions.CodeExecutionError: Code execution failed
+
+2025-02-28 21:31:54 [INFO] Using Prompt: <table dialect="duckdb" table_name="table_data" dimensions="700x16">
+Segment,Country, Product , Discount Band ,Units Sold, Manufacturing Price , Sale Price , Gross Sales , Discounts ,  Sales , COGS , Profit ,Date,Month Number, Month Name ,Year
+Government,Canada, Carretera , None ,1618.5, $3.00 , $20.00 ," $32,370.00 ", $-   ," $32,370.00 "," $16,185.00 "," $16,185.00 ",1/1/14,1, January ,2014
+Government,Germany, Carretera , None ,1321.0, $3.00 , $20.00 ," $26,420.00 ", $-   ," $26,420.00 "," $13,210.00 "," $13,210.00 ",1/1/14,1, January ,2014
+Midmarket,France, Carretera , None ,2178.0, $3.00 , $15.00 ," $32,670.00 ", $-   ," $32,670.00 "," $21,780.00 "," $10,890.00 ",6/1/14,6, June ,2014
+Midmarket,Germany, Carretera , None ,888.0, $3.00 , $15.00 ," $13,320.00 ", $-   ," $13,320.00 "," $8,880.00 "," $4,440.00 ",6/1/14,6, June ,2014
+Midmarket,Mexico, Carretera , None ,2470.0, $3.00 , $15.00 ," $37,050.00 ", $-   ," $37,050.00 "," $24,700.00 "," $12,350.00 ",6/1/14,6, June ,2014
+</table>
+
+
+The user asked the following question:
+### QUERY
+ give me graphs to understand this data 
+
+You generated the following Python code:
+import pandas as pd
+import matplotlib.pyplot as plt
+sql_query = """
+SELECT 
+    Country,
+    Segment,
+    SUM("Gross Sales") AS Total_Gross_Sales,
+    SUM("Sales") AS Total_Sales,
+    SUM(Profit) AS Total_Profit
+FROM 
+    table_data
+GROUP BY 
+    Country, Segment
+ORDER BY 
+    Total_Gross_Sales DESC
+"""
+data = execute_sql_query(sql_query)
+plt.figure(figsize=(12, 6))
+plt.subplot(1, 3, 1)
+data.pivot(index='Country', columns='Segment', values='Total_Gross_Sales').plot(kind='bar', ax=plt.gca())
+plt.title('Total Gross Sales by Country and Segment')
+plt.ylabel('Total Gross Sales')
+plt.xticks(rotation=45)
+plt.subplot(1, 3, 2)
+data.pivot(index='Country', columns='Segment', values='Total_Sales').plot(kind='bar', ax=plt.gca())
+plt.title('Total Sales by Country and Segment')
+plt.ylabel('Total Sales')
+plt.xticks(rotation=45)
+plt.subplot(1, 3, 3)
+data.pivot(index='Country', columns='Segment', values='Total_Profit').plot(kind='bar', ax=plt.gca())
+plt.title('Total Profit by Country and Segment')
+plt.ylabel('Total Profit')
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.savefig('exports/charts/temp_chart_d7142894-b2e8-42b5-82c9-2f47bbbac666.png')
+result = {'type': 'plot', 'value': 'exports/charts/temp_chart_d7142894-b2e8-42b5-82c9-2f47bbbac666.png'}
+
+However, it resulted in the following error:
+Traceback (most recent call last):
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 136, in _execute_local_sql_query
+    return db_manager.sql(query).df()
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/data_loader/duck_db_connection_manager.py", line 38, in sql
+    return self.connection.sql(query)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+duckdb.duckdb.BinderException: Binder Error: Referenced column "Gross Sales" not found in FROM clause!
+Candidate bindings: "table_data. Gross Sales ", "table_data. Sale Price ", "table_data.  Sales ", "table_data.Units Sold", "table_data. Profit "
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/core/code_execution/code_executor.py", line 29, in execute
+    exec(code, self._environment)
+  File "<string>", line 17, in <module>
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 157, in _execute_sql_query
+    return self._execute_local_sql_query(query)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 138, in _execute_local_sql_query
+    raise RuntimeError(f"SQL execution failed: {e}") from e
+RuntimeError: SQL execution failed: Binder Error: Referenced column "Gross Sales" not found in FROM clause!
+Candidate bindings: "table_data. Gross Sales ", "table_data. Sale Price ", "table_data.  Sales ", "table_data.Units Sold", "table_data. Profit "
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 169, in execute_with_retries
+    result = self.execute_code(code)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 121, in execute_code
+    return code_executor.execute_and_return_result(code)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/core/code_execution/code_executor.py", line 38, in execute_and_return_result
+    self.execute(code)
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/core/code_execution/code_executor.py", line 31, in execute
+    raise CodeExecutionError("Code execution failed") from e
+pandasai.exceptions.CodeExecutionError: Code execution failed
+
+
+Fix the python code above and return the new python code but the code generated should use execute_sql_query function
+2025-02-28 21:32:00 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-02-28 21:32:00 [INFO] Code Generated:
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Corrected SQL query with proper column name references
+sql_query = """
+SELECT 
+    "Country",
+    "Segment",
+    SUM("Gross Sales") AS Total_Gross_Sales,
+    SUM("Sales") AS Total_Sales,
+    SUM("Profit") AS Total_Profit
+FROM 
+    table_data
+GROUP BY 
+    "Country", "Segment"
+ORDER BY 
+    Total_Gross_Sales DESC
+"""
+
+# Execute the SQL query
+data = execute_sql_query(sql_query)
+
+# Create bar plots for Total Gross Sales, Total Sales, and Total Profit
+plt.figure(figsize=(12, 6))
+
+# Total Gross Sales
+plt.subplot(1, 3, 1)
+data.pivot(index='Country', columns='Segment', values='Total_Gross_Sales').plot(kind='bar', ax=plt.gca())
+plt.title('Total Gross Sales by Country and Segment')
+plt.ylabel('Total Gross Sales')
+plt.xticks(rotation=45)
+
+# Total Sales
+plt.subplot(1, 3, 2)
+data.pivot(index='Country', columns='Segment', values='Total_Sales').plot(kind='bar', ax=plt.gca())
+plt.title('Total Sales by Country and Segment')
+plt.ylabel('Total Sales')
+plt.xticks(rotation=45)
+
+# Total Profit
+plt.subplot(1, 3, 3)
+data.pivot(index='Country', columns='Segment', values='Total_Profit').plot(kind='bar', ax=plt.gca())
+plt.title('Total Profit by Country and Segment')
+plt.ylabel('Total Profit')
+plt.xticks(rotation=45)
+
+plt.tight_layout()
+plt.savefig('exports/charts/temp_chart_d7142894-b2e8-42b5-82c9-2f47bbbac666.png')
+result = {'type': 'plot', 'value': 'exports/charts/temp_chart_d7142894-b2e8-42b5-82c9-2f47bbbac666.png'}
+2025-02-28 21:32:00 [INFO] Validating code requirements...
+2025-02-28 21:32:00 [INFO] Code validation successful.
+2025-02-28 21:32:00 [INFO] Cleaning the generated code...
+2025-02-28 21:32:00 [INFO] Executing code: import pandas as pd
+import matplotlib.pyplot as plt
+sql_query = """
+SELECT 
+    "Country",
+    "Segment",
+    SUM("Gross Sales") AS Total_Gross_Sales,
+    SUM("Sales") AS Total_Sales,
+    SUM("Profit") AS Total_Profit
+FROM 
+    table_data
+GROUP BY 
+    "Country", "Segment"
+ORDER BY 
+    Total_Gross_Sales DESC
+"""
+data = execute_sql_query(sql_query)
+plt.figure(figsize=(12, 6))
+plt.subplot(1, 3, 1)
+data.pivot(index='Country', columns='Segment', values='Total_Gross_Sales').plot(kind='bar', ax=plt.gca())
+plt.title('Total Gross Sales by Country and Segment')
+plt.ylabel('Total Gross Sales')
+plt.xticks(rotation=45)
+plt.subplot(1, 3, 2)
+data.pivot(index='Country', columns='Segment', values='Total_Sales').plot(kind='bar', ax=plt.gca())
+plt.title('Total Sales by Country and Segment')
+plt.ylabel('Total Sales')
+plt.xticks(rotation=45)
+plt.subplot(1, 3, 3)
+data.pivot(index='Country', columns='Segment', values='Total_Profit').plot(kind='bar', ax=plt.gca())
+plt.title('Total Profit by Country and Segment')
+plt.ylabel('Total Profit')
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.savefig('exports/charts/temp_chart_769fa004-5c24-4922-977c-40a5eb6bb7a8.png')
+result = {'type': 'plot', 'value': 'exports/charts/temp_chart_769fa004-5c24-4922-977c-40a5eb6bb7a8.png'}
+2025-02-28 21:32:00 [INFO] Retrying execution (3/3)...
+2025-02-28 21:32:00 [INFO] Execution failed with error: Traceback (most recent call last):
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 136, in _execute_local_sql_query
+    return db_manager.sql(query).df()
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/data_loader/duck_db_connection_manager.py", line 38, in sql
+    return self.connection.sql(query)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+duckdb.duckdb.BinderException: Binder Error: Referenced column "Gross Sales" not found in FROM clause!
+Candidate bindings: "table_data. Gross Sales ", "table_data. Sale Price ", "table_data.  Sales ", "table_data.Units Sold", "table_data. Profit "
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/core/code_execution/code_executor.py", line 29, in execute
+    exec(code, self._environment)
+  File "<string>", line 17, in <module>
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 157, in _execute_sql_query
+    return self._execute_local_sql_query(query)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 138, in _execute_local_sql_query
+    raise RuntimeError(f"SQL execution failed: {e}") from e
+RuntimeError: SQL execution failed: Binder Error: Referenced column "Gross Sales" not found in FROM clause!
+Candidate bindings: "table_data. Gross Sales ", "table_data. Sale Price ", "table_data.  Sales ", "table_data.Units Sold", "table_data. Profit "
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 169, in execute_with_retries
+    result = self.execute_code(code)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 121, in execute_code
+    return code_executor.execute_and_return_result(code)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/core/code_execution/code_executor.py", line 38, in execute_and_return_result
+    self.execute(code)
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/core/code_execution/code_executor.py", line 31, in execute
+    raise CodeExecutionError("Code execution failed") from e
+pandasai.exceptions.CodeExecutionError: Code execution failed
+
+2025-02-28 21:32:00 [INFO] Using Prompt: <table dialect="duckdb" table_name="table_data" dimensions="700x16">
+Segment,Country, Product , Discount Band ,Units Sold, Manufacturing Price , Sale Price , Gross Sales , Discounts ,  Sales , COGS , Profit ,Date,Month Number, Month Name ,Year
+Government,Canada, Carretera , None ,1618.5, $3.00 , $20.00 ," $32,370.00 ", $-   ," $32,370.00 "," $16,185.00 "," $16,185.00 ",1/1/14,1, January ,2014
+Government,Germany, Carretera , None ,1321.0, $3.00 , $20.00 ," $26,420.00 ", $-   ," $26,420.00 "," $13,210.00 "," $13,210.00 ",1/1/14,1, January ,2014
+Midmarket,France, Carretera , None ,2178.0, $3.00 , $15.00 ," $32,670.00 ", $-   ," $32,670.00 "," $21,780.00 "," $10,890.00 ",6/1/14,6, June ,2014
+Midmarket,Germany, Carretera , None ,888.0, $3.00 , $15.00 ," $13,320.00 ", $-   ," $13,320.00 "," $8,880.00 "," $4,440.00 ",6/1/14,6, June ,2014
+Midmarket,Mexico, Carretera , None ,2470.0, $3.00 , $15.00 ," $37,050.00 ", $-   ," $37,050.00 "," $24,700.00 "," $12,350.00 ",6/1/14,6, June ,2014
+</table>
+
+
+The user asked the following question:
+### QUERY
+ give me graphs to understand this data 
+
+You generated the following Python code:
+import pandas as pd
+import matplotlib.pyplot as plt
+sql_query = """
+SELECT 
+    "Country",
+    "Segment",
+    SUM("Gross Sales") AS Total_Gross_Sales,
+    SUM("Sales") AS Total_Sales,
+    SUM("Profit") AS Total_Profit
+FROM 
+    table_data
+GROUP BY 
+    "Country", "Segment"
+ORDER BY 
+    Total_Gross_Sales DESC
+"""
+data = execute_sql_query(sql_query)
+plt.figure(figsize=(12, 6))
+plt.subplot(1, 3, 1)
+data.pivot(index='Country', columns='Segment', values='Total_Gross_Sales').plot(kind='bar', ax=plt.gca())
+plt.title('Total Gross Sales by Country and Segment')
+plt.ylabel('Total Gross Sales')
+plt.xticks(rotation=45)
+plt.subplot(1, 3, 2)
+data.pivot(index='Country', columns='Segment', values='Total_Sales').plot(kind='bar', ax=plt.gca())
+plt.title('Total Sales by Country and Segment')
+plt.ylabel('Total Sales')
+plt.xticks(rotation=45)
+plt.subplot(1, 3, 3)
+data.pivot(index='Country', columns='Segment', values='Total_Profit').plot(kind='bar', ax=plt.gca())
+plt.title('Total Profit by Country and Segment')
+plt.ylabel('Total Profit')
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.savefig('exports/charts/temp_chart_769fa004-5c24-4922-977c-40a5eb6bb7a8.png')
+result = {'type': 'plot', 'value': 'exports/charts/temp_chart_769fa004-5c24-4922-977c-40a5eb6bb7a8.png'}
+
+However, it resulted in the following error:
+Traceback (most recent call last):
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 136, in _execute_local_sql_query
+    return db_manager.sql(query).df()
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/data_loader/duck_db_connection_manager.py", line 38, in sql
+    return self.connection.sql(query)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+duckdb.duckdb.BinderException: Binder Error: Referenced column "Gross Sales" not found in FROM clause!
+Candidate bindings: "table_data. Gross Sales ", "table_data. Sale Price ", "table_data.  Sales ", "table_data.Units Sold", "table_data. Profit "
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/core/code_execution/code_executor.py", line 29, in execute
+    exec(code, self._environment)
+  File "<string>", line 17, in <module>
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 157, in _execute_sql_query
+    return self._execute_local_sql_query(query)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 138, in _execute_local_sql_query
+    raise RuntimeError(f"SQL execution failed: {e}") from e
+RuntimeError: SQL execution failed: Binder Error: Referenced column "Gross Sales" not found in FROM clause!
+Candidate bindings: "table_data. Gross Sales ", "table_data. Sale Price ", "table_data.  Sales ", "table_data.Units Sold", "table_data. Profit "
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 169, in execute_with_retries
+    result = self.execute_code(code)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 121, in execute_code
+    return code_executor.execute_and_return_result(code)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/core/code_execution/code_executor.py", line 38, in execute_and_return_result
+    self.execute(code)
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/core/code_execution/code_executor.py", line 31, in execute
+    raise CodeExecutionError("Code execution failed") from e
+pandasai.exceptions.CodeExecutionError: Code execution failed
+
+
+Fix the python code above and return the new python code but the code generated should use execute_sql_query function
+2025-02-28 21:32:08 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-02-28 21:32:08 [INFO] Code Generated:
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Corrected SQL query with trimmed column names
+sql_query = """
+SELECT 
+    "Country",
+    "Segment",
+    SUM("Gross Sales ") AS Total_Gross_Sales,
+    SUM("Sales ") AS Total_Sales,
+    SUM("Profit ") AS Total_Profit
+FROM 
+    table_data
+GROUP BY 
+    "Country", "Segment"
+ORDER BY 
+    Total_Gross_Sales DESC
+"""
+
+# Execute the SQL query
+data = execute_sql_query(sql_query)
+
+# Create bar plots for Total Gross Sales, Total Sales, and Total Profit
+plt.figure(figsize=(12, 6))
+
+# Total Gross Sales
+plt.subplot(1, 3, 1)
+data.pivot(index='Country', columns='Segment', values='Total_Gross_Sales').plot(kind='bar', ax=plt.gca())
+plt.title('Total Gross Sales by Country and Segment')
+plt.ylabel('Total Gross Sales')
+plt.xticks(rotation=45)
+
+# Total Sales
+plt.subplot(1, 3, 2)
+data.pivot(index='Country', columns='Segment', values='Total_Sales').plot(kind='bar', ax=plt.gca())
+plt.title('Total Sales by Country and Segment')
+plt.ylabel('Total Sales')
+plt.xticks(rotation=45)
+
+# Total Profit
+plt.subplot(1, 3, 3)
+data.pivot(index='Country', columns='Segment', values='Total_Profit').plot(kind='bar', ax=plt.gca())
+plt.title('Total Profit by Country and Segment')
+plt.ylabel('Total Profit')
+plt.xticks(rotation=45)
+
+plt.tight_layout()
+plt.savefig('exports/charts/temp_chart_769fa004-5c24-4922-977c-40a5eb6bb7a8.png')
+
+result = {'type': 'plot', 'value': 'exports/charts/temp_chart_769fa004-5c24-4922-977c-40a5eb6bb7a8.png'}
+2025-02-28 21:32:08 [INFO] Validating code requirements...
+2025-02-28 21:32:08 [INFO] Code validation successful.
+2025-02-28 21:32:08 [INFO] Cleaning the generated code...
+2025-02-28 21:32:08 [INFO] Executing code: import pandas as pd
+import matplotlib.pyplot as plt
+sql_query = """
+SELECT 
+    "Country",
+    "Segment",
+    SUM("Gross Sales ") AS Total_Gross_Sales,
+    SUM("Sales ") AS Total_Sales,
+    SUM("Profit ") AS Total_Profit
+FROM 
+    table_data
+GROUP BY 
+    "Country", "Segment"
+ORDER BY 
+    Total_Gross_Sales DESC
+"""
+data = execute_sql_query(sql_query)
+plt.figure(figsize=(12, 6))
+plt.subplot(1, 3, 1)
+data.pivot(index='Country', columns='Segment', values='Total_Gross_Sales').plot(kind='bar', ax=plt.gca())
+plt.title('Total Gross Sales by Country and Segment')
+plt.ylabel('Total Gross Sales')
+plt.xticks(rotation=45)
+plt.subplot(1, 3, 2)
+data.pivot(index='Country', columns='Segment', values='Total_Sales').plot(kind='bar', ax=plt.gca())
+plt.title('Total Sales by Country and Segment')
+plt.ylabel('Total Sales')
+plt.xticks(rotation=45)
+plt.subplot(1, 3, 3)
+data.pivot(index='Country', columns='Segment', values='Total_Profit').plot(kind='bar', ax=plt.gca())
+plt.title('Total Profit by Country and Segment')
+plt.ylabel('Total Profit')
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.savefig('exports/charts/temp_chart_c7e45bf8-fb99-4a14-8ed3-577817c0e032.png')
+result = {'type': 'plot', 'value': 'exports/charts/temp_chart_c7e45bf8-fb99-4a14-8ed3-577817c0e032.png'}
+2025-02-28 21:32:08 [INFO] Max retries reached. Error: Code execution failed
+2025-02-28 21:32:08 [INFO] Processing failed with error: Traceback (most recent call last):
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 136, in _execute_local_sql_query
+    return db_manager.sql(query).df()
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/data_loader/duck_db_connection_manager.py", line 38, in sql
+    return self.connection.sql(query)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+duckdb.duckdb.BinderException: Binder Error: Referenced column "Gross Sales " not found in FROM clause!
+Candidate bindings: "table_data. Gross Sales ", "table_data.  Sales ", "table_data. Sale Price ", "table_data. Discounts ", "table_data. Profit "
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/core/code_execution/code_executor.py", line 29, in execute
+    exec(code, self._environment)
+  File "<string>", line 17, in <module>
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 157, in _execute_sql_query
+    return self._execute_local_sql_query(query)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 138, in _execute_local_sql_query
+    raise RuntimeError(f"SQL execution failed: {e}") from e
+RuntimeError: SQL execution failed: Binder Error: Referenced column "Gross Sales " not found in FROM clause!
+Candidate bindings: "table_data. Gross Sales ", "table_data.  Sales ", "table_data. Sale Price ", "table_data. Discounts ", "table_data. Profit "
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 250, in _process_query
+    result = self.execute_with_retries(code)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 169, in execute_with_retries
+    result = self.execute_code(code)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/agent/base.py", line 121, in execute_code
+    return code_executor.execute_and_return_result(code)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/core/code_execution/code_executor.py", line 38, in execute_and_return_result
+    self.execute(code)
+  File "/Users/jashvinuyeshwanth/.pyenv/versions/3.11.7/lib/python3.11/site-packages/pandasai/core/code_execution/code_executor.py", line 31, in execute
+    raise CodeExecutionError("Code execution failed") from e
+pandasai.exceptions.CodeExecutionError: Code execution failed
+
+2025-02-28 21:32:38 [INFO] Question: give me a pie chart  to understand country split  
+2025-02-28 21:32:38 [INFO] Running PandaAI with openai LLM...
+2025-02-28 21:32:38 [INFO] Prompt ID: 11241e75-f70f-4abe-9314-b0d2686b9b5c
+2025-02-28 21:32:38 [INFO] Generating new code...
+2025-02-28 21:32:38 [INFO] Using Prompt: <tables>
+
+<table dialect="duckdb" table_name="table_data" dimensions="700x16">
+Segment,Country, Product , Discount Band ,Units Sold, Manufacturing Price , Sale Price , Gross Sales , Discounts ,  Sales , COGS , Profit ,Date,Month Number, Month Name ,Year
+Government,Canada, Carretera , None ,1618.5, $3.00 , $20.00 ," $32,370.00 ", $-   ," $32,370.00 "," $16,185.00 "," $16,185.00 ",1/1/14,1, January ,2014
+Government,Germany, Carretera , None ,1321.0, $3.00 , $20.00 ," $26,420.00 ", $-   ," $26,420.00 "," $13,210.00 "," $13,210.00 ",1/1/14,1, January ,2014
+Midmarket,France, Carretera , None ,2178.0, $3.00 , $15.00 ," $32,670.00 ", $-   ," $32,670.00 "," $21,780.00 "," $10,890.00 ",6/1/14,6, June ,2014
+Midmarket,Germany, Carretera , None ,888.0, $3.00 , $15.00 ," $13,320.00 ", $-   ," $13,320.00 "," $8,880.00 "," $4,440.00 ",6/1/14,6, June ,2014
+Midmarket,Mexico, Carretera , None ,2470.0, $3.00 , $15.00 ," $37,050.00 ", $-   ," $37,050.00 "," $24,700.00 "," $12,350.00 ",6/1/14,6, June ,2014
+</table>
+
+
+</tables>
+
+You are already provided with the following functions that you can call:
+<function>
+def execute_sql_query(sql_query: str) -> pd.Dataframe
+    """This method connects to the database, executes the sql query and returns the dataframe"""
+</function>
+
+
+Update this initial code:
+```python
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+
+# Declare result var: 
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+```
+
+
+
+### QUERY
+ give me a pie chart  to understand country split  
+
+At the end, declare "result" variable as a dictionary of type and value.
+
+
+Generate python code and return full updated code:
+
+### Note: Use only relevant table for query and do aggregation, sorting, joins and grouby through sql query
