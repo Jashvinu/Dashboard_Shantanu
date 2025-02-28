@@ -2,23 +2,62 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from datetime import datetime
+import os
 
 try:
     import pandasai as pai
-    from pandasai_openai import OpenAI
     
-    # Load OpenAI LLM
-    llm = OpenAI(api_token=st.secrets["OPENAI_API_KEY"])  # Use Streamlit secrets instead of hardcoding
+    # Set your PandaBI API key - get from https://app.pandabi.ai
+    # First try to get from secrets, then environment, then allow manual entry
+    PANDABI_API_KEY = st.secrets.get("PANDABI_API_KEY", os.environ.get("PANDABI_API_KEY", None))
     
-    # Configure OpenAI LLM in PandasAI
-    pai.config.set({
-        "llm": llm,
-    })
-    
-    PANDAS_AI_AVAILABLE = True
-    
+    if PANDABI_API_KEY:
+        pai.api_key.set(PANDABI_API_KEY)
+        PANDAS_AI_AVAILABLE = True
+    else:
+        PANDAS_AI_AVAILABLE = False
+        
 except ImportError:
     PANDAS_AI_AVAILABLE = False
+
+# Function to load data - keeping your existing function
+@st.cache_data
+def load_data():
+    try:
+        # Read the CSV file directly - assume it exists
+        df = pd.read_csv("data.csv")
+
+        # Clean up any currency symbols in numeric columns
+        numeric_columns = ['Units Sold', 'Manufacturing Price', 'Sale Price',
+                           'Gross Sales', 'Discounts', 'Sales', 'COGS', 'Profit',
+                           'Month Number', 'Year']
+
+        for col in numeric_columns:
+            if col in df.columns:
+                # Remove currency symbols and commas if present
+                if df[col].dtype == 'object':
+                    df[col] = df[col].astype(str).str.replace(
+                        r'[$,]', '', regex=True)
+                    df[col] = pd.to_numeric(df[col], errors='coerce')
+
+        # Convert date column if it exists
+        if 'Date' in df.columns:
+            try:
+                # Use explicit format to avoid warning
+                df['Date'] = pd.to_datetime(df['Date'], format='%m/%d/%Y', errors='coerce')
+                df['Date'] = df['Date'].dt.date
+            except:
+                try:
+                    # Try alternative format
+                    df['Date'] = pd.to_datetime(df['Date'], format='%d/%m/%Y', errors='coerce')
+                    df['Date'] = df['Date'].dt.date
+                except:
+                    pass
+
+        return df
+    except Exception as e:
+        st.error(f"Error reading data.csv: {str(e)}")
+        return pd.DataFrame()
 # Page configuration
 
 st.set_page_config(layout="wide")
@@ -637,114 +676,211 @@ with tab3:
 
 
 # Allow users to upload their own CSV file
+def convert_to_pai_dataframe(pandas_df):
+    # Method 1: Save to temporary CSV and reload with PandasAI
+    temp_file = "temp_data_for_pai.csv"
+    pandas_df.to_csv(temp_file, index=False)
+    pai_df = pai.read_csv(temp_file)
+    # Clean up temp file (optional)
+    # import os
+    # os.remove(temp_file)
+    return pai_df
+
+# Add this to the sidebar section of your dashboard
+def fallback_analysis(df, query):
+    """Provide basic analysis when PandasAI fails"""
+    query = query.lower()
+    
+    if "total" in query and any(col in query for col in df.columns):
+        # Try to identify which column to sum
+        for col in df.columns:
+            if col.lower() in query and pd.api.types.is_numeric_dtype(df[col]):
+                return f"Total {col}: {df[col].sum()}"
+    
+    elif "average" in query or "mean" in query:
+        for col in df.columns:
+            if col.lower() in query and pd.api.types.is_numeric_dtype(df[col]):
+                return f"Average {col}: {df[col].mean()}"
+    
+    elif "maximum" in query or "highest" in query:
+        for col in df.columns:
+            if col.lower() in query and pd.api.types.is_numeric_dtype(df[col]):
+                max_val = df[col].max()
+                max_row = df[df[col] == max_val]
+                return f"Maximum {col}: {max_val}, found in row: {max_row.to_dict('records')[0]}"
+                
+    elif "count" in query:
+        if "group by" in query or "grouped by" in query:
+            for col in df.columns:
+                if col.lower() in query:
+                    return f"Count by {col}:\n{df[col].value_counts()}"
+        else:
+            return f"Total count of rows: {len(df)}"
+    
+    # Return a generic response if no specific analysis was matched
+    return "I couldn't process that query. Here's some basic information about your data:\n" + \
+           f"- Number of rows: {len(df)}\n" + \
+           f"- Columns: {', '.join(df.columns)}\n" + \
+           f"- Data types: {df.dtypes.to_string()}"
+
+# Add this to the sidebar section of your dashboard
 with st.sidebar:
     st.header("Chat with Your Data")
-    
+
     if PANDAS_AI_AVAILABLE:
-        # Display LLM configuration information (optional, can be toggled)
-        with st.expander("LLM Configuration"):
-            st.write(f"LLM Type: {type(llm).__name__}")
-            st.write("LLM Configuration:")
-            st.write(f"- Model: {llm.model}")
-            st.write(f"- Temperature: {llm.temperature}")
-            st.write(f"- Max Tokens: {llm.max_tokens}")
+        # Load data for chat
+        df_data = load_data()  # Your existing load_data function
+        
+        if not df_data.empty:
+            # Add diagnostics section
+            with st.expander("Diagnostics", expanded=False):
+                st.write("Data Preview:")
+                st.dataframe(df_data.head(3))
+                
+                st.write("Data Types:")
+                st.write(df_data.dtypes)
+                
+                st.write("PandasAI Status:")
+                st.write(f"API Key Set: {'Yes' if PANDABI_API_KEY else 'No'}")
+                
+                # Test API connection
+                if st.button("Test API Connection"):
+                    try:
+                        # Save a tiny test dataset
+                        test_df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
+                        test_df.to_csv("test_data.csv", index=False)
+                        
+                        # Try to use PandasAI with simple query
+                        test_pai_df = pai.read_csv("test_data.csv")
+                        with st.spinner("Testing API..."):
+                            response = test_pai_df.chat("How many rows are in this data?")
+                            st.success(f"Connection successful! Response: {response}")
+                    except Exception as e:
+                        st.error(f"API Connection failed: {str(e)}")
             
-            # Verify LLM configuration
-            config = pai.config.get()
-            st.write(f"- LLM in config: {type(config.llm).__name__}")
-        
-        # Load data
-        @st.cache_data
-        def load_data_for_chat():
-            try:
-                # Read the data.csv file as specified
-                return pai.read_csv("data.csv")
-            except Exception as e:
-                st.error(f"Error reading data.csv: {str(e)}")
-                return None
-        
-        df = load_data_for_chat()
-        
-        if df is not None:
-            try:
-                # Initialize chat history if it doesn't exist
-                if 'chat_history' not in st.session_state:
-                    st.session_state.chat_history = []
-                
-                # Create the chat input with a more descriptive prompt
-                user_query = st.text_input(
-                    "Ask a question about your data (e.g., 'What is the correlation between Sales and Profit?'):"
-                )
-                
-                if user_query:
-                    with st.spinner("Analyzing your data..."):
-                        try:
-                            # Use direct chat method with PandasAI
-                            response = df.chat(user_query)
+            # Initialize chat history if it doesn't exist
+            if 'chat_history' not in st.session_state:
+                st.session_state.chat_history = []
+
+            # Create the chat input
+            user_query = st.text_input(
+                "Ask a question about your data:",
+                placeholder="e.g., What is the total profit by country?"
+            )
+
+            # Fallback option toggle
+            use_fallback = st.checkbox("Use pandas fallback if PandasAI fails", value=True)
+
+            if user_query:
+                with st.spinner("Analyzing your data..."):
+                    try:
+                        # First attempt: Save to CSV and use PandasAI
+                        temp_csv = "temp_data_for_pai.csv"
+                        df_data.to_csv(temp_csv, index=False)
+                        
+                        # Use PandasAI
+                        pai_df = pai.read_csv(temp_csv)
+                        
+                        # Try multiple times with increasing timeout
+                        max_attempts = 3
+                        for attempt in range(1, max_attempts + 1):
+                            try:
+                                with st.spinner(f"Attempt {attempt}/{max_attempts} - Analyzing data..."):
+                                    # Set a timeout for the API call
+                                    response = pai_df.chat(user_query)
+                                    
+                                    # Check if we got a valid response
+                                    if "not able to get your answer" in response or not response:
+                                        if attempt < max_attempts:
+                                            st.warning(f"Retrying... (attempt {attempt}/{max_attempts})")
+                                            time.sleep(2)  # Wait before retrying
+                                            continue
+                                        else:
+                                            raise Exception("PandasAI couldn't process the query")
+                                    
+                                    # Success path
+                                    st.success("Analysis complete!")
+                                    st.markdown(f"**Answer:** {response}")
+                                    
+                                    # Add to chat history
+                                    st.session_state.chat_history.append({
+                                        "query": user_query,
+                                        "response": response,
+                                        "method": "PandasAI"
+                                    })
+                                    break  # Exit the retry loop on success
+                                    
+                            except Exception as e:
+                                if attempt < max_attempts:
+                                    st.warning(f"Attempt failed. Retrying... ({attempt}/{max_attempts})")
+                                    time.sleep(2)  # Wait before retrying
+                                else:
+                                    raise e  # Re-raise the exception after all attempts
+                        
+                    except Exception as e:
+                        st.error(f"PandasAI analysis failed: {str(e)}")
+                        
+                        # Use fallback analysis with pandas if enabled
+                        if use_fallback:
+                            st.warning("Switching to pandas fallback analysis...")
+                            fallback_response = fallback_analysis(df_data, user_query)
+                            st.markdown(f"**Fallback Answer:** {fallback_response}")
                             
                             # Add to chat history
                             st.session_state.chat_history.append({
                                 "query": user_query,
-                                "response": response
+                                "response": fallback_response,
+                                "method": "Pandas Fallback"
                             })
-                            
-                            # Display the response in a success box
-                            st.success("Analysis complete!")
-                            st.markdown(f"### Answer:\n{response}")
-                            
-                        except Exception as e:
-                            st.error(f"Error analyzing data: {str(e)}")
-                
-                # Display chat history with better formatting
-                if st.session_state.chat_history:
-                    st.subheader("Chat History")
-                    for i, chat in enumerate(reversed(st.session_state.chat_history)):
-                        with st.expander(f"Q: {chat['query'][:50]}..." if len(chat['query']) > 50 else f"Q: {chat['query']}"):
-                            st.markdown("**Question:**")
-                            st.info(chat['query'])
-                            st.markdown("**Answer:**")
-                            st.success(chat['response'])
+                        else:
+                            st.info("Try rephrasing your question or enabling the fallback option.")
+
+            # Display chat history
+            if st.session_state.chat_history:
+                st.subheader("Chat History")
+                for i, chat in enumerate(reversed(st.session_state.chat_history)):
+                    with st.expander(f"Q: {chat['query'][:50]}..." if len(chat['query']) > 50 else f"Q: {chat['query']}"):
+                        st.markdown("**Question:**")
+                        st.info(chat['query'])
+                        st.markdown(f"**Answer:** ({chat['method']})")
+                        st.success(chat['response'])
+
+                # Clear chat history button
+                if st.button("Clear Chat History"):
+                    st.session_state.chat_history = []
+                    st.experimental_rerun()
                     
-                    # Clear chat history button
-                    if st.button("Clear Chat History"):
-                        st.session_state.chat_history = []
-                        st.experimental_rerun()
-                        
-                # Add example questions to help users
-                with st.expander("Example Questions"):
-                    st.markdown("""
-                    Try asking:
-                    - What is the total profit by country?
-                    - Which product has the highest sales?
-                    - Show me the trend of units sold over time
-                    - Compare performance between segments
-                    - What's the correlation between discount and profit?
-                    """)
-                    
-            except Exception as e:
-                st.error(f"Error initializing chat: {str(e)}")
+            # Add example questions to help users
+            with st.expander("Recommended Questions"):
+                st.markdown("""
+                Try these questions that have been tested to work:
+                - How many rows are in this dataset?
+                - What are the column names?
+                - What is the maximum profit?
+                - What is the minimum sales?
+                - Count the rows by country
+                - Calculate the average sales
+                """)
         else:
             st.warning(
-                "No data available for analysis. Please ensure data.csv exists and is properly formatted."
+                "No data available for analysis. Please check your data.csv file."
             )
     else:
-        st.warning("""
-        PandasAI package is not available. To enable the chat feature, please install the required packages:
-        ```
-        pip install pandasai pandasai-openai
-        ```
-        Then restart the application.
-        """)
-        
-        # Alternative visualization options
-        st.subheader("Alternative Data Exploration")
-        
-        # Add options to view basic stats about the data
-        if st.button("View Data Summary"):
-            df = pd.read_csv("data.csv")
-            if not df.empty:
-                st.write("Data Shape:", df.shape)
-                st.write("Column Types:")
-                st.write(df.dtypes)
-                st.write("Basic Statistics:")
-                st.write(df.describe())
+        # Handle case where PandaBI setup is not complete
+        if not PANDABI_API_KEY:
+            api_key = st.text_input("Enter your PandaBI API key:", type="password")
+            if api_key and st.button("Save API Key"):
+                try:
+                    pai.api_key.set(api_key)
+                    st.success("API key set successfully! Refreshing...")
+                    st.experimental_rerun()
+                except Exception as e:
+                    st.error(f"Error setting API key: {str(e)}")
+        else:
+            st.warning("""
+            PandasAI package is not available. To enable the chat feature, please install the required package:
+            ```
+            pip install pandasai
+            ```
+            Then restart the application.
+            """)
