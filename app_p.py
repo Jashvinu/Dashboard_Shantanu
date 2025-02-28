@@ -2,33 +2,62 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from datetime import datetime
+import os
 
 try:
     import pandasai as pai
-    from pandasai_openai import OpenAI
     
-    # Load OpenAI LLM
-    llm = OpenAI(
-    api_token=st.secrets["OPENAI_API_KEY"],
-    model="gpt-4o-mini",      # Choose model: gpt-4, gpt-3.5-turbo, etc.
-    temperature=0.2,            # 0.0 (deterministic) to 1.0 (creative)
-    max_tokens=10000,            # Maximum length of response
-    additional_kwargs={          # Optional additional parameters
-        "top_p": 0.95,
-        "frequency_penalty": 0.0,
-        "presence_penalty": 0.0
-    }
-)
+    # Set your PandaBI API key - get from https://app.pandabi.ai
+    # First try to get from secrets, then environment, then allow manual entry
+    PANDABI_API_KEY = st.secrets.get("PANDABI_API_KEY", os.environ.get("PANDABI_API_KEY", None))
     
-    # Configure OpenAI LLM in PandasAI
-    pai.config.set({
-        "llm": llm,
-    })
-    
-    PANDAS_AI_AVAILABLE = True
-    
+    if PANDABI_API_KEY:
+        pai.api_key.set(PANDABI_API_KEY)
+        PANDAS_AI_AVAILABLE = True
+    else:
+        PANDAS_AI_AVAILABLE = False
+        
 except ImportError:
     PANDAS_AI_AVAILABLE = False
+
+# Function to load data - keeping your existing function
+@st.cache_data
+def load_data():
+    try:
+        # Read the CSV file directly - assume it exists
+        df = pd.read_csv("data.csv")
+
+        # Clean up any currency symbols in numeric columns
+        numeric_columns = ['Units Sold', 'Manufacturing Price', 'Sale Price',
+                           'Gross Sales', 'Discounts', 'Sales', 'COGS', 'Profit',
+                           'Month Number', 'Year']
+
+        for col in numeric_columns:
+            if col in df.columns:
+                # Remove currency symbols and commas if present
+                if df[col].dtype == 'object':
+                    df[col] = df[col].astype(str).str.replace(
+                        r'[$,]', '', regex=True)
+                    df[col] = pd.to_numeric(df[col], errors='coerce')
+
+        # Convert date column if it exists
+        if 'Date' in df.columns:
+            try:
+                # Use explicit format to avoid warning
+                df['Date'] = pd.to_datetime(df['Date'], format='%m/%d/%Y', errors='coerce')
+                df['Date'] = df['Date'].dt.date
+            except:
+                try:
+                    # Try alternative format
+                    df['Date'] = pd.to_datetime(df['Date'], format='%d/%m/%Y', errors='coerce')
+                    df['Date'] = df['Date'].dt.date
+                except:
+                    pass
+
+        return df
+    except Exception as e:
+        st.error(f"Error reading data.csv: {str(e)}")
+        return pd.DataFrame()
 # Page configuration
 
 st.set_page_config(layout="wide")
@@ -647,65 +676,70 @@ with tab3:
 
 
 # Allow users to upload their own CSV file
+def convert_to_pai_dataframe(pandas_df):
+    # Method 1: Save to temporary CSV and reload with PandasAI
+    temp_file = "temp_data_for_pai.csv"
+    pandas_df.to_csv(temp_file, index=False)
+    pai_df = pai.read_csv(temp_file)
+    # Clean up temp file (optional)
+    # import os
+    # os.remove(temp_file)
+    return pai_df
+
+# Add this to the sidebar section of your dashboard
 with st.sidebar:
+    st.header("Dashboard Settings")
+
+    # Add a refresh button
+    if st.button("Refresh Data"):
+        st.cache_data.clear()
+        st.success("Data cache cleared. Dashboard will refresh with latest data.")
+        st.experimental_rerun()
+
+    # Updated chat section using PandaBI
     st.header("Chat with Your Data")
-    
+
     if PANDAS_AI_AVAILABLE:
-        # Display LLM configuration information (optional, can be toggled)
-        with st.expander("LLM Configuration"):
-            st.write(f"LLM Type: {type(llm).__name__}")
-            st.write("LLM Configuration:")
-            st.write(f"- Model: {llm.model}")
-            st.write(f"- Temperature: {llm.temperature}")
-            st.write(f"- Max Tokens: {llm.max_tokens}")
-            
-            # Verify LLM configuration
-            config = pai.config.get()
-            st.write(f"- LLM in config: {type(config.llm).__name__}")
+        # Load data for chat
+        df_data = load_data()  # Your existing load_data function
         
-        # Load data
-        @st.cache_data
-        def load_data_for_chat():
-            try:
-                # Read the data.csv file as specified
-                return pai.read_csv("data.csv")
-            except Exception as e:
-                st.error(f"Error reading data.csv: {str(e)}")
-                return None
-        
-        df = load_data_for_chat()
-        
-        if df is not None:
+        if not df_data.empty:
             try:
                 # Initialize chat history if it doesn't exist
                 if 'chat_history' not in st.session_state:
                     st.session_state.chat_history = []
-                
-                # Create the chat input with a more descriptive prompt
+
+                # Create the chat input
                 user_query = st.text_input(
-                    "Ask a question about your data (e.g., 'What is the correlation between Sales and Profit?'):"
+                    "Ask a question about your data:",
+                    placeholder="e.g., What is the total profit by country?"
                 )
-                
+
                 if user_query:
                     with st.spinner("Analyzing your data..."):
                         try:
-                            # Use direct chat method with PandasAI
-                            response = df.chat(user_query)
+                            # Convert the pandas DataFrame to a PandasAI DataFrame
+                            pai_df = convert_to_pai_dataframe(df_data)
                             
+                            # Use PandasAI to chat with the data
+                            response = pai_df.chat(user_query)
+
                             # Add to chat history
                             st.session_state.chat_history.append({
                                 "query": user_query,
                                 "response": response
                             })
-                            
-                            # Display the response in a success box
+
+                            # Display the response
                             st.success("Analysis complete!")
-                            st.markdown(f"### Answer:\n{response}")
-                            
+                            st.markdown(f"**Answer:** {response}")
+
                         except Exception as e:
                             st.error(f"Error analyzing data: {str(e)}")
-                
-                # Display chat history with better formatting
+                            st.error("Full error details:")
+                            st.exception(e)
+
+                # Display chat history
                 if st.session_state.chat_history:
                     st.subheader("Chat History")
                     for i, chat in enumerate(reversed(st.session_state.chat_history)):
@@ -714,7 +748,7 @@ with st.sidebar:
                             st.info(chat['query'])
                             st.markdown("**Answer:**")
                             st.success(chat['response'])
-                    
+
                     # Clear chat history button
                     if st.button("Clear Chat History"):
                         st.session_state.chat_history = []
@@ -730,28 +764,40 @@ with st.sidebar:
                     - Compare performance between segments
                     - What's the correlation between discount and profit?
                     """)
-                    
+
             except Exception as e:
                 st.error(f"Error initializing chat: {str(e)}")
+                st.exception(e)
         else:
             st.warning(
-                "No data available for analysis. Please ensure data.csv exists and is properly formatted."
+                "No data available for analysis. Please check your data.csv file."
             )
     else:
-        st.warning("""
-        PandasAI package is not available. To enable the chat feature, please install the required packages:
-        ```
-        pip install pandasai pandasai-openai
-        ```
-        Then restart the application.
-        """)
-        
+        # Handle case where PandaBI setup is not complete
+        if not PANDABI_API_KEY:
+            api_key = st.text_input("Enter your PandaBI API key:", type="password")
+            if api_key and st.button("Save API Key"):
+                try:
+                    pai.api_key.set(api_key)
+                    st.success("API key set successfully! Refreshing...")
+                    st.experimental_rerun()
+                except Exception as e:
+                    st.error(f"Error setting API key: {str(e)}")
+        else:
+            st.warning("""
+            PandasAI package is not available. To enable the chat feature, please install the required package:
+            ```
+            pip install pandasai
+            ```
+            Then restart the application.
+            """)
+
         # Alternative visualization options
         st.subheader("Alternative Data Exploration")
-        
+
         # Add options to view basic stats about the data
         if st.button("View Data Summary"):
-            df = pd.read_csv("data.csv")
+            df = load_data()
             if not df.empty:
                 st.write("Data Shape:", df.shape)
                 st.write("Column Types:")
