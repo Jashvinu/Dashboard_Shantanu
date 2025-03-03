@@ -2,34 +2,34 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from datetime import datetime
+import base64
+import io
+import matplotlib.pyplot as plt
 
 try:
     import pandasai as pai
     from pandasai_openai import OpenAI
-    
+
     # Load OpenAI LLM
     llm = OpenAI(
-    api_token=st.secrets["OPENAI_API_KEY"],
-    model="gpt-4o-mini",      # Choose model: gpt-4, gpt-3.5-turbo, etc.
-    temperature=0.2,            # 0.0 (deterministic) to 1.0 (creative)
-    max_tokens=4000,            # Maximum length of response
-    additional_kwargs={          # Optional additional parameters
-        "top_p": 0.95,
-        "frequency_penalty": 0.0,
-        "presence_penalty": 0.0
-    }
+        api_token=st.secrets["OPENAI_API_KEY"],
+        model="gpt-4o-mini",      # Choose model: gpt-4, gpt-3.5-turbo, etc.
+        temperature=0.2,            # 0.0 (deterministic) to 1.0 (creative)
+        max_tokens=4000,            # Maximum length of response
+        additional_kwargs={          # Optional additional parameters
+            "top_p": 0.95,
+            "frequency_penalty": 0.0,
+            "presence_penalty": 0.0
+        }
     )
-    
 
-    
-    
     # Configure OpenAI LLM in PandasAI
     pai.config.set({
         "llm": llm,
     })
-    
+
     PANDAS_AI_AVAILABLE = True
-    
+
 except ImportError:
     PANDAS_AI_AVAILABLE = False
 # Page configuration
@@ -41,7 +41,46 @@ if 'plotly_config' not in st.session_state:
         'responsive': True
     }
 
+# Initialize session state variables for pop-up modals
+if 'show_chart_popup' not in st.session_state:
+    st.session_state.show_chart_popup = False
+
+if 'chart_content' not in st.session_state:
+    st.session_state.chart_content = None
+
+if 'chart_title' not in st.session_state:
+    st.session_state.chart_title = ""
+
+# Define popup management functions
+
+
+def show_popup(title, content):
+    st.session_state.show_chart_popup = True
+    st.session_state.chart_content = content
+    st.session_state.chart_title = title
+
+
+def close_popup():
+    st.session_state.show_chart_popup = False
+    st.session_state.chart_content = None
+    st.session_state.chart_title = ""
+
+# Helper functions for chart conversion
+
+
+def get_plotly_html(fig):
+    return fig.to_html(include_plotlyjs='cdn', full_html=False)
+
+
+def get_matplotlib_image(fig):
+    buf = io.BytesIO()
+    fig.savefig(buf, format='png', bbox_inches='tight')
+    buf.seek(0)
+    img_str = base64.b64encode(buf.read()).decode()
+    return f'<img src="data:image/png;base64,{img_str}" style="width:100%">'
+
 # Import plotly.express to avoid using go directly
+
 
 # Custom CSS
 st.markdown("""
@@ -605,7 +644,6 @@ with tab3:
 
     # Format the DataFrame for display
     display_df = filtered_df.copy()
-    
 
     # Format currency columns
     currency_columns = ['Manufacturing Price', 'Sale Price', 'Gross Sales',
@@ -658,7 +696,7 @@ with tab3:
 # Allow users to upload their own CSV file
 with st.sidebar:
     st.header("Chat with Your Data")
-    
+
     if PANDAS_AI_AVAILABLE:
         # Display LLM configuration information (optional, can be toggled)
         with st.expander("LLM Configuration"):
@@ -667,11 +705,11 @@ with st.sidebar:
             st.write(f"- Model: {llm.model}")
             st.write(f"- Temperature: {llm.temperature}")
             st.write(f"- Max Tokens: {llm.max_tokens}")
-            
+
             # Verify LLM configuration
             config = pai.config.get()
             st.write(f"- LLM in config: {type(config.llm).__name__}")
-        
+
         # Load data
         @st.cache_data
         def load_data_for_chat():
@@ -681,15 +719,15 @@ with st.sidebar:
             except Exception as e:
                 st.error(f"Error reading data.csv: {str(e)}")
                 return None
-        
+
         df = load_data_for_chat()
-        
+
         if df is not None:
             try:
                 # Initialize chat history if it doesn't exist
                 if 'chat_history' not in st.session_state:
                     st.session_state.chat_history = []
-                
+
                 # Create the chat input with a more descriptive prompt
                 user_query = st.text_input(
                     "Ask a question about your data:",
@@ -699,31 +737,21 @@ with st.sidebar:
                 if user_query:
                     with st.spinner("Analyzing your data..."):
                         try:
-                            # Use direct chat method with PandasAI
                             response = df.chat(user_query)
-                            
-                            # Add to chat history
                             st.session_state.chat_history.append({
                                 "query": user_query,
                                 "response": response
                             })
-                            
-                            # Display the response in a success box
-                            st.success("Analysis complete!")
-                            
-                            # Display the response below the input field
-                            st.markdown(f"### Answer:\n{response}")
-                            
-                            # Check if response contains image references (this is a common format for PandasAI responses)
-                            if "![" in response or "<img" in response:
-                                # The markdown renderer in Streamlit should handle this, but we'll ensure it's visible
-                                st.markdown("### Visualization:")
-                                st.markdown(response)
-                            
+
+                            # Display a preview and button to show popup
+                            st.success(
+                                "Analysis complete! Click below to view:")
+                            if st.button("View Chart/Analysis"):
+                                show_popup(f"Analysis: {user_query}", response)
+
                         except Exception as e:
                             st.error(f"Error analyzing data: {str(e)}")
 
-                
                 # Display chat history with better formatting
                 if st.session_state.chat_history:
                     st.subheader("Chat History")
@@ -732,13 +760,15 @@ with st.sidebar:
                             st.markdown("**Question:**")
                             st.info(chat['query'])
                             st.markdown("**Answer:**")
-                            st.success(chat['response'])
-                    
+                            if st.button(f"View Result #{i+1}", key=f"view_result_{i}"):
+                                show_popup(
+                                    f"Analysis: {chat['query']}", chat['response'])
+
                     # Clear chat history button
                     if st.button("Clear Chat History"):
                         st.session_state.chat_history = []
                         st.experimental_rerun()
-                        
+
                 # Add example questions to help users
                 with st.expander("Example Questions"):
                     st.markdown("""
@@ -749,7 +779,7 @@ with st.sidebar:
                     - Compare performance between segments
                     - What's the correlation between discount and profit?
                     """)
-                    
+
             except Exception as e:
                 st.error(f"Error initializing chat: {str(e)}")
         else:
@@ -764,10 +794,10 @@ with st.sidebar:
         ```
         Then restart the application.
         """)
-        
+
         # Alternative visualization options
         st.subheader("Alternative Data Exploration")
-        
+
         # Add options to view basic stats about the data
         if st.button("View Data Summary"):
             df = pd.read_csv("data.csv")
@@ -777,3 +807,21 @@ with st.sidebar:
                 st.write(df.dtypes)
                 st.write("Basic Statistics:")
                 st.write(df.describe())
+
+if st.session_state.show_chart_popup:
+    popup = st.empty()
+    with popup.container():
+        st.markdown("""
+            <div class="modal-backdrop">
+                <div class="modal-content">
+                    <h2>{}</h2>
+                    <hr>
+                    <div>{}</div>
+                    <button class="modal-close" onclick="this.parentElement.style.display='none'">×</button>
+                </div>
+            </div>
+        """.format(st.session_state.chart_title, st.session_state.chart_content), unsafe_allow_html=True)
+
+        if st.button("Close", key="close_popup_button"):
+            close_popup()
+            st.experimental_rerun()
