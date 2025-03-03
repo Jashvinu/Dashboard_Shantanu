@@ -678,7 +678,7 @@ with tab3:
 # Allow users to upload their own CSV file
 def convert_to_pai_dataframe(pandas_df):
     # Method 1: Save to temporary CSV and reload with PandasAI
-    temp_file = "temp_data_for_pai.csv"
+    temp_file = "data.csv"
     pandas_df.to_csv(temp_file, index=False)
     pai_df = pai.read_csv(temp_file)
     # Clean up temp file (optional)
@@ -712,7 +712,7 @@ with st.sidebar:
                 # Create the chat input
                 user_query = st.text_input(
                     "Ask a question about your data:",
-                    placeholder="e.g., What is the total profit by country?"
+                    placeholder="e.g., Total Loaned amount"
                 )
 
                 if user_query:
@@ -754,16 +754,7 @@ with st.sidebar:
                         st.session_state.chat_history = []
                         st.experimental_rerun()
                         
-                # Add example questions to help users
-                with st.expander("Example Questions"):
-                    st.markdown("""
-                    Try asking:
-                    - What is the total profit by country?
-                    - Which product has the highest sales?
-                    - Show me the trend of units sold over time
-                    - Compare performance between segments
-                    - What's the correlation between discount and profit?
-                    """)
+                
 
             except Exception as e:
                 st.error(f"Error initializing chat: {str(e)}")

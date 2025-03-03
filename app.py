@@ -12,7 +12,7 @@ try:
     api_token=st.secrets["OPENAI_API_KEY"],
     model="gpt-4o-mini",      # Choose model: gpt-4, gpt-3.5-turbo, etc.
     temperature=0.2,            # 0.0 (deterministic) to 1.0 (creative)
-    max_tokens=10000,            # Maximum length of response
+    max_tokens=4000,            # Maximum length of response
     additional_kwargs={          # Optional additional parameters
         "top_p": 0.95,
         "frequency_penalty": 0.0,
