@@ -1,5 +1,6 @@
 streamlit
-pandas
+
 plotly
-pandasai 
+pandasai>=3.0.0b2
 pandasai-openai
+
