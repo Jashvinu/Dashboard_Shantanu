@@ -18,7 +18,10 @@ try:
         "frequency_penalty": 0.0,
         "presence_penalty": 0.0
     }
-)
+    )
+    
+
+    
     
     # Configure OpenAI LLM in PandasAI
     pai.config.set({
@@ -32,6 +35,11 @@ except ImportError:
 # Page configuration
 
 st.set_page_config(layout="wide")
+if 'plotly_config' not in st.session_state:
+    st.session_state.plotly_config = {
+        'displayModeBar': False,
+        'responsive': True
+    }
 
 # Import plotly.express to avoid using go directly
 
@@ -597,6 +605,7 @@ with tab3:
 
     # Format the DataFrame for display
     display_df = filtered_df.copy()
+    
 
     # Format currency columns
     currency_columns = ['Manufacturing Price', 'Sale Price', 'Gross Sales',
@@ -683,9 +692,10 @@ with st.sidebar:
                 
                 # Create the chat input with a more descriptive prompt
                 user_query = st.text_input(
-                    "Ask a question about your data (e.g., 'What is the correlation between Sales and Profit?'):"
+                    "Ask a question about your data:",
+                    placeholder="Give the loan education types in a pie chart"
                 )
-                
+
                 if user_query:
                     with st.spinner("Analyzing your data..."):
                         try:
@@ -700,10 +710,19 @@ with st.sidebar:
                             
                             # Display the response in a success box
                             st.success("Analysis complete!")
+                            
+                            # Display the response below the input field
                             st.markdown(f"### Answer:\n{response}")
+                            
+                            # Check if response contains image references (this is a common format for PandasAI responses)
+                            if "![" in response or "<img" in response:
+                                # The markdown renderer in Streamlit should handle this, but we'll ensure it's visible
+                                st.markdown("### Visualization:")
+                                st.markdown(response)
                             
                         except Exception as e:
                             st.error(f"Error analyzing data: {str(e)}")
+
                 
                 # Display chat history with better formatting
                 if st.session_state.chat_history:
