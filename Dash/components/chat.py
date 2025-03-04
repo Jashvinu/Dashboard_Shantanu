@@ -1,197 +1,194 @@
 import streamlit as st
-from utils.data_loader import load_data_for_chat, in_memory_chart_function
+from utils.data_loader import load_data_for_chat
 from utils.pandasai_config import PANDAS_AI_AVAILABLE, display_in_memory_image
 import re
 import os
+import pandas as pd
+from datetime import datetime
 
 def render_chat_component():
     """Render a standalone chat component that displays responses directly below"""
     st.header("Chat with Your Data")
 
-    # Initialize image gallery state if needed
-    if 'image_gallery' not in st.session_state:
-        st.session_state.image_gallery = []
+    # Initialize chat history if it doesn't exist
+    if 'chat_history' not in st.session_state:
+        st.session_state.chat_history = []
+    
+    # Initialize current image
+    if 'current_image' not in st.session_state:
+        st.session_state.current_image = None
 
     if PANDAS_AI_AVAILABLE:
         try:
-            # Load data
-            df = load_data_for_chat()
+            # Create tab layout for chat and gallery
+            tabs = st.tabs(["Chat", "Image Gallery"])
+            
+            with tabs[0]:  # Chat tab
+                # Load data
+                df = load_data_for_chat()
 
-            if df is not None:
-                # Initialize chat history if it doesn't exist
-                if 'chat_history' not in st.session_state:
-                    st.session_state.chat_history = []
+                if df is not None:
+                    # Use a form with a unique key
+                    with st.form(key="chat_form"):
+                        user_query = st.text_input(
+                            "Ask a question about your data:",
+                            placeholder="E.g., Show loan data by chart"
+                        )
+                        submit_button = st.form_submit_button("Analyze Data")
+                    
+                        if submit_button and user_query:
+                            # Set a flag to process after the form is submitted
+                            st.session_state.process_query = True
+                            st.session_state.current_query = user_query
 
-                # Use a form with a unique key
-                with st.form(key="chat_form"):
-                    user_query = st.text_input(
-                        "Ask a question about your data:",
-                        placeholder="E.g., Show loan data by chart"
-                    )
-                    submit_button = st.form_submit_button("Analyze Data")
-                
-                    if submit_button and user_query:
-                        # Set a flag to process after the form is submitted
-                        st.session_state.process_query = True
-                        st.session_state.current_query = user_query
-
-                # Process the query outside the form if flag is set
-                if 'process_query' in st.session_state and st.session_state.process_query:
-                    with st.spinner("Analyzing your data..."):
-                        try:
-                            response = df.chat(st.session_state.current_query)
-                            
-                            # Process the response for image detection
-                            image_path = None
-                            if isinstance(response, str):
-                                # Check for chart ID
-                                if response.startswith("chart_"):
-                                    image_path = response.strip()
-                                # Check for file path
-                                elif response.startswith("exports/") and (
-                                    response.endswith(".png") or 
-                                    response.endswith(".jpg") or
-                                    response.endswith(".jpeg")
-                                ):
-                                    image_path = response.strip()
-                            
-                            # Add to gallery if it's an image
-                            if image_path is not None:
-                                st.session_state.image_gallery.append({
-                                    "id": len(st.session_state.image_gallery),
-                                    "path": image_path,
+                    # Process the query outside the form if flag is set
+                    if 'process_query' in st.session_state and st.session_state.process_query:
+                        with st.spinner("Analyzing your data..."):
+                            try:
+                                # Get the response
+                                response = df.chat(st.session_state.current_query)
+                                
+                                # Store in chat history
+                                st.session_state.chat_history.append({
                                     "query": st.session_state.current_query,
-                                    "timestamp": pd.Timestamp.now().strftime("%Y-%m-%d %H:%M:%S")
+                                    "response": response,
+                                    "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                                 })
-                            
-                            # Store in chat history
-                            st.session_state.chat_history.append({
-                                "query": st.session_state.current_query,
-                                "response": response
-                            })
-                            
-                            # Reset the flag to prevent infinite loop
-                            st.session_state.process_query = False
-                        except Exception as e:
-                            st.error(f"Error analyzing data: {str(e)}")
-                            # Reset the flag to prevent infinite loop
-                            st.session_state.process_query = False
-                            
-                # Display current analysis result (if available)
-                if 'chat_history' in st.session_state and st.session_state.chat_history:
-                    latest_query = st.session_state.chat_history[-1]["query"]
-                    latest_response = st.session_state.chat_history[-1]["response"]
-                    
-                    # Show success message
-                    st.success("Analysis complete!")
-                    
-                    # Display the response
-                    if isinstance(latest_response, str):
-                        # Check if response is just a chart_id (in-memory chart)
-                        if latest_response.startswith("chart_"):
-                            chart_id = latest_response.strip()
-                            # Try to display the in-memory image
-                            if not display_in_memory_image(chart_id):
-                                st.warning("Could not display the generated chart.")
-                                st.text(latest_response)
-                        # Check if it's a file path (for backward compatibility)
-                        elif latest_response.startswith("exports/") and (
-                            latest_response.endswith(".png") or 
-                            latest_response.endswith(".jpg")
-                        ):
-                            # Try to display it if it exists
-                            if os.path.exists(latest_response):
-                                st.image(latest_response)
-                            else:
-                                st.text("Chart generated with file path: " + latest_response)
-                        else:
-                            # Regular text response
-                            st.markdown(latest_response)
-                    else:
-                        # For non-string responses (could be pandas dataframes, plotly figures, etc.)
-                        st.write(latest_response)
+                                
+                                # If it's a chart, update the current image
+                                if isinstance(response, str) and response.startswith("chart_"):
+                                    st.session_state.current_image = response
+                                    # Auto-switch to gallery tab when a chart is generated
+                                    st.experimental_set_query_params(active_tab="gallery")
+                                
+                                # Reset the flag to prevent infinite loop
+                                st.session_state.process_query = False
+                            except Exception as e:
+                                st.error(f"Error analyzing data: {str(e)}")
+                                # Reset the flag to prevent infinite loop
+                                st.session_state.process_query = False
 
-                # Display the image gallery if we have images
-                if st.session_state.image_gallery:
-                    st.subheader("Image Gallery")
-                    
-                    # Create a horizontal layout for image selector
-                    gallery_cols = st.columns([1, 3])
-                    
-                    with gallery_cols[0]:
-                        # Create a selectbox for image selection
-                        image_options = [f"#{img['id']}: {img['query'][:20]}..." for img in st.session_state.image_gallery]
-                        selected_idx = st.selectbox("Select image:", 
-                                                   range(len(image_options)), 
-                                                   format_func=lambda i: image_options[i])
+                    # Display chat history
+                    if st.session_state.chat_history:
+                        st.subheader("Conversation")
                         
-                        # Button to clear gallery
-                        if st.button("Clear Gallery"):
-                            st.session_state.image_gallery = []
+                        # Display each message
+                        for i, chat in enumerate(st.session_state.chat_history):
+                            # User message
+                            with st.container():
+                                st.markdown(f"**You:**")
+                                st.info(chat["query"])
+                            
+                            # Assistant message
+                            with st.container():
+                                st.markdown(f"**Assistant:** _(at {chat.get('timestamp', '')})_")
+                                
+                                response = chat["response"]
+                                if isinstance(response, str) and response.startswith("chart_"):
+                                    st.success("I've generated a chart based on your data. View it in the Image Gallery tab.")
+                                    # Add a button to view the image
+                                    if st.button(f"View Chart", key=f"view_chart_{i}"):
+                                        st.session_state.current_image = response
+                                        st.experimental_set_query_params(active_tab="gallery")
+                                        st.rerun()
+                                elif isinstance(response, str):
+                                    st.markdown(response)
+                                else:
+                                    st.write(response)
+                            
+                            # Add a separator between messages
+                            st.markdown("---")
+                        
+                        # Button to clear conversation
+                        if st.button("Clear Conversation"):
+                            st.session_state.chat_history = []
+                            st.session_state.current_image = None
                             st.rerun()
-                    
-                    with gallery_cols[1]:
-                        # Display the selected image
-                        if selected_idx is not None and selected_idx < len(st.session_state.image_gallery):
-                            img_data = st.session_state.image_gallery[selected_idx]
-                            
-                            # Display image details
-                            st.markdown(f"**Query:** {img_data['query']}")
-                            st.markdown(f"**Created:** {img_data['timestamp']}")
-                            
-                            # Display the image
-                            img_path = img_data['path']
-                            if img_path.startswith("chart_"):
-                                display_in_memory_image(img_path)
-                            elif os.path.exists(img_path):
-                                st.image(img_path)
-                            else:
-                                st.warning(f"Image not found: {img_path}")
 
-                # Example Questions expandable section
-                with st.expander("Example Questions"):
-                    st.markdown("""
-                    Try asking:
-                    - What is the total profit by country?
-                    - Show loan data by chart
-                    - Types of loans
-                    - Show a pie chart based on education
-                    - Compare performance between segments
-                    """)
+                    # Example Questions expandable section
+                    with st.expander("Example Questions"):
+                        st.markdown("""
+                        Try asking:
+                        - What is the total profit by country?
+                        - Show loan data by chart
+                        - Types of loans
+                        - Show a pie chart based on education
+                        - Compare performance between segments
+                        """)
+                else:
+                    st.warning(
+                        "No data available for analysis. Please ensure data.csv exists and is properly formatted."
+                    )
+            
+            with tabs[1]:  # Image Gallery tab
+                st.subheader("Image Gallery")
                 
-                # Display previous analyses
-                if len(st.session_state.chat_history) > 0:
-                    st.subheader("Previous Analyses")
+                # Get all charts from chat history
+                chart_responses = []
+                for i, chat in enumerate(st.session_state.chat_history):
+                    response = chat["response"]
+                    if isinstance(response, str) and response.startswith("chart_"):
+                        chart_responses.append({
+                            "chart_id": response,
+                            "query": chat["query"],
+                            "index": i,
+                            "timestamp": chat.get("timestamp", "")
+                        })
+                
+                if chart_responses:
+                    # Create a selector for the charts
+                    chart_options = [f"#{i+1}: {chart['query'][:30]}..." for i, chart in enumerate(chart_responses)]
                     
-                    # Clear history button
-                    if st.button("Clear History"):
-                        st.session_state.chat_history = []
-                        st.rerun()
+                    # Find index of current image
+                    selected_idx = 0
+                    if st.session_state.current_image:
+                        for i, chart in enumerate(chart_responses):
+                            if chart["chart_id"] == st.session_state.current_image:
+                                selected_idx = i
+                                break
                     
-                    # Show all except the most recent (which is already shown above)
-                    for i, chat in enumerate(reversed(st.session_state.chat_history[:-1])):
-                        with st.expander(f"Q: {chat['query']}"):
-                            st.markdown("**Question:**")
-                            st.info(chat['query'])
-                            st.markdown("**Answer:**")
-                            
-                            # For text responses, just show the text
-                            if isinstance(chat['response'], str) and not (
-                                chat['response'].startswith("chart_") or 
-                                (chat['response'].startswith("exports/") and 
-                                 (chat['response'].endswith(".png") or chat['response'].endswith(".jpg")))
-                            ):
-                                st.markdown(chat['response'])
-                            elif isinstance(chat['response'], str):
-                                st.text("Response included a chart. See Image Gallery.")
-                            else:
-                                # For non-string responses
-                                st.write(chat['response'])
-
-            else:
-                st.warning(
-                    "No data available for analysis. Please ensure data.csv exists and is properly formatted."
-                )
+                    # Use a selectbox to navigate between charts
+                    selected_chart_idx = st.selectbox(
+                        "Select chart:",
+                        range(len(chart_options)),
+                        format_func=lambda i: chart_options[i],
+                        index=selected_idx
+                    )
+                    
+                    # Display the selected chart
+                    selected_chart = chart_responses[selected_chart_idx]
+                    
+                    # Update current image
+                    st.session_state.current_image = selected_chart["chart_id"]
+                    
+                    # Display chart info
+                    st.markdown(f"**Query:** {selected_chart['query']}")
+                    st.markdown(f"**Generated at:** {selected_chart['timestamp']}")
+                    
+                    # Display the chart
+                    st.markdown("### Chart:")
+                    display_in_memory_image(selected_chart["chart_id"])
+                    
+                    # Add navigation buttons
+                    col1, col2, col3 = st.columns([1, 2, 1])
+                    
+                    with col1:
+                        if selected_chart_idx > 0:
+                            if st.button("Previous Chart"):
+                                st.session_state.current_image = chart_responses[selected_chart_idx - 1]["chart_id"]
+                                st.rerun()
+                    
+                    with col2:
+                        st.markdown(f"Chart {selected_chart_idx + 1} of {len(chart_responses)}")
+                    
+                    with col3:
+                        if selected_chart_idx < len(chart_responses) - 1:
+                            if st.button("Next Chart"):
+                                st.session_state.current_image = chart_responses[selected_chart_idx + 1]["chart_id"]
+                                st.rerun()
+                else:
+                    st.info("No charts have been generated yet. Ask a question that requires data visualization to see charts here.")
+                
         except Exception as e:
             st.error(f"Error initializing chat: {str(e)}")
             import traceback
