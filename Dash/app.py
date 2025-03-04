@@ -1,6 +1,7 @@
 import streamlit as st
 from utils.page_config import setup_page_config, init_session_state, apply_custom_css
 from components.header import render_header
+from components.home import render_home
 from components.project_tab import render_project_tab
 from components.finance_tab import render_finance_tab
 from components.data_tab import render_data_tab
@@ -15,20 +16,23 @@ def main():
     # Render header
     render_header()
     
-    # Navigation tabs
-    tab1, tab2, tab3, tab4 = st.tabs(
-        ["Project Management", "Finance & Reports", "Data Table", "Chat with Data"])
+    # Navigation tabs - now including Home as the first tab
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(
+        ["Home", "Project Management", "Finance & Reports", "Data Table", "Chat with Data"])
     
     with tab1:
+        render_home()
+        
+    with tab2:
         render_project_tab()
     
-    with tab2:
+    with tab3:
         render_finance_tab()
     
-    with tab3:
+    with tab4:
         render_data_tab()
         
-    with tab4:
+    with tab5:
         # Add the chat component directly as a tab
         render_chat_component()
 

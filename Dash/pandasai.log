@@ -363,3 +363,101 @@ result = {'type': 'plot', 'value': 'exports/charts/temp_chart_7c54c30a-84b8-4e9f
 2025-03-04 17:24:16 [INFO] Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
 2025-03-04 17:24:16 [INFO] Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
 2025-03-04 17:24:16 [INFO] Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-03-04 22:01:45 [INFO] Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-03-04 22:01:45 [INFO] Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-03-04 22:01:45 [INFO] Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-03-04 22:01:45 [INFO] Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-03-04 22:01:46 [INFO] Question: give the loan education types in a pie chart 
+2025-03-04 22:01:46 [INFO] Running PandaAI with bamboo_llm LLM...
+2025-03-04 22:01:46 [INFO] Prompt ID: 8e87bfd7-bffa-4efe-bb86-6f3cc24d9abb
+2025-03-04 22:01:46 [INFO] Generating new code...
+2025-03-04 22:01:46 [INFO] Using Prompt: <tables>
+
+<table dialect="duckdb" table_name="table_6e46407590b8a012bcf01066e8606378" dimensions="500x11">
+Loan_ID,loan_status,Principal,terms,effective_date,due_date,paid_off_time,past_due_days,age,education,Gender
+xqd20166231,PAIDOFF,1000,30,9/8/2016,10/7/2016,9/14/2016 19:31,,45,High School or Below,male
+xqd20168902,PAIDOFF,1000,30,9/8/2016,10/7/2016,10/7/2016 9:00,,50,Bechalor,female
+xqd20160003,PAIDOFF,1000,30,9/8/2016,10/7/2016,9/25/2016 16:58,,33,Bechalor,female
+xqd20160004,PAIDOFF,1000,15,9/8/2016,9/22/2016,9/22/2016 20:00,,27,college,male
+xqd20160005,PAIDOFF,1000,30,9/9/2016,10/8/2016,9/23/2016 21:36,,28,college,female
+</table>
+
+
+</tables>
+
+You are already provided with the following functions that you can call:
+<function>
+def execute_sql_query(sql_query: str) -> pd.Dataframe
+    """This method connects to the database, executes the sql query and returns the dataframe"""
+</function>
+
+
+Update this initial code:
+```python
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+
+# Declare result var: 
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+```
+
+
+
+### QUERY
+ give the loan education types in a pie chart 
+
+At the end, declare "result" variable as a dictionary of type and value.
+
+
+Generate python code and return full updated code:
+
+### Note: Use only relevant table for query and do aggregation, sorting, joins and grouby through sql query
+2025-03-04 22:01:58 [INFO] Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-03-04 22:01:58 [INFO] Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-03-04 22:01:58 [INFO] Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-03-04 22:01:58 [INFO] Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-03-04 22:01:59 [INFO] Code Generated:
+# TODO: import the required dependencies
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Write code here
+sql_query = "SELECT education, COUNT(*) as count FROM table_6e46407590b8a012bcf01066e8606378 GROUP BY education;"
+df = execute_sql_query(sql_query)
+
+# Plotting the pie chart
+plt.figure(figsize=(10,7))
+plt.pie(df['count'], labels = df['education'], autopct='%1.1f%%')
+plt.title('Loan Education Types')
+plt.axis('equal')
+plt.savefig('loan_education_types.png')
+
+# Declare result var: 
+result = { "type": "plot", "value": 'loan_education_types.png' }
+2025-03-04 22:01:59 [INFO] Validating code requirements...
+2025-03-04 22:01:59 [INFO] Code validation successful.
+2025-03-04 22:01:59 [INFO] Cleaning the generated code...
+2025-03-04 22:01:59 [INFO] Executing code: import pandas as pd
+import matplotlib.pyplot as plt
+sql_query = 'SELECT education, COUNT(*) as count FROM table_6e46407590b8a012bcf01066e8606378 GROUP BY education'
+df = execute_sql_query(sql_query)
+plt.figure(figsize=(10, 7))
+plt.pie(df['count'], labels=df['education'], autopct='%1.1f%%')
+plt.title('Loan Education Types')
+plt.axis('equal')
+plt.savefig('exports/charts/temp_chart_3a9c911d-4b44-4a0a-a15e-a951a4d9f96b.png')
+result = {'type': 'plot', 'value': 'exports/charts/temp_chart_3a9c911d-4b44-4a0a-a15e-a951a4d9f96b.png'}
+2025-03-04 22:01:59 [INFO] Response generated successfully.
+2025-03-04 22:02:51 [INFO] Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-03-04 22:02:51 [INFO] Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-03-04 22:02:51 [INFO] Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-03-04 22:02:51 [INFO] Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-03-04 22:02:51 [INFO] Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-03-04 22:02:51 [INFO] Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-03-04 22:02:52 [INFO] Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-03-04 22:02:52 [INFO] Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-03-04 22:02:52 [INFO] Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-03-04 22:02:52 [INFO] Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
