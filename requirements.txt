@@ -1,0 +1,10 @@
+streamlit
+pandas>
+plotly>=5.13.0
+matplotlib>=3.7.1
+beautifulsoup4>=4.12.0
+pandasai>=1.0.0
+pandasai-openai>=1.0.0
+python-dotenv>=1.0.0
+numpy>=1.24.0
+scipy>=1.10.0
